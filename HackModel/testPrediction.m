@@ -10,17 +10,19 @@ function [accuracy, predictions, A, B, state] = testPrediction(data, Sn, Hn, Wn,
     hvaccheckdata(data, Sn, Hn, Wn);
     
     datasize = size(data, 1);
-    separator_index = max(datasize - 17520, round(separator * datasize));
-    traindata = 1 : separator_index;
-    testdata = separator_index : datasize;
-    
-    clear separator_index;
+    s_index = max(datasize - 17520, round(separator * datasize));
+    traindata = 1 : s_index;
+    testdata = s_index + 1 : datasize;
 
-    [A, B] = HackModel(data(traindata, :), Sn, Hn, Wn, On, maxIteration, true);
+    [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
     
-    prev_forward_prob = [data(trainsize, 1) == 0, data(trainsize, 1) == 1];
+    prev_forward_prob = [data(s_index, 1) == 0; data(s_index, 1) == 1];
     
     new_data = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn);
     
-    % to be finished
+    predictions = new_data(:, 1);
+    
+    accuracy = 1 - sum(abs(predictions - data(testdata, 1)))/(datasize - s_index);
+    
+    statePlot(data(testdata, :), predictions, Sn, Hn, Wn);
 end

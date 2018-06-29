@@ -1,6 +1,7 @@
 % HVAC_HMM "Hack" model using time-shifting
 % Please set the Current Folder to hvac_hmm
-addpath(genpath('./formed_data'));
+% Please locate formed_data in the parent directory of hvac_hmm
+addpath(genpath('../formed_data'));
 addpath(genpath('./HMMall'));
 addpath(genpath('./HackModel'));
 

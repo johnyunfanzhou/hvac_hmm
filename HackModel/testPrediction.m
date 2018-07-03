@@ -16,13 +16,17 @@ function [accuracy, predictions, A, B, state] = testPrediction(data, Sn, Hn, Wn,
 
     [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
     
-    prev_forward_prob = [data(s_index, 1) == 0; data(s_index, 1) == 1];
+    prev_forward_prob = [data(s_index, 1) == 0, data(s_index, 1) == 1];
     
-    new_data = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn);
+    [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn);
     
     predictions = new_data(:, 1);
     
     accuracy = 1 - sum(abs(predictions - data(testdata, 1)))/(datasize - s_index);
     
+    figure('Name','Discrete Predictions','NumberTitle','off');
     statePlot(data(testdata, :), predictions, Sn, Hn, Wn);
+    
+    figure('Name', 'Forward Probabilities', 'NumberTitle', 'off');
+    forwardProbPlot(data(testdata, :), forward_prob, Sn, Hn, Wn);
 end

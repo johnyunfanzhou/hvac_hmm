@@ -17,8 +17,8 @@ function [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data, S
         if datasize - n > 17519
             data = data(1 : n + 17519, :);
         end
-        if ~isequal(size(prev_forward_prob), [2, 1])
-            error('Invalid probability vector size. Previous forward probabily has to be size 2x1.');
+        if size(prev_forward_prob, 2) ~= 2
+            error('Invalid probability vector size. Previous forward probabily has to be size nx2.');
         end
         hvaccheckmatrix(A, B, Sn, Hn, Wn);
         hvaccheckdata(data, Sn, Hn, Wn);
@@ -54,10 +54,17 @@ function [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data, S
     
     clear abortCheck datacontinuous data;
     
-    forward_prob = (((B(index, :) ./ sum(B(index, :))) * prev_forward_prob)' * A(index, :) * B(index, :))';
-    new_data(n, 1) = argmax(forward_prob) - 1;
+    if n == 1
+        next_forward_prob = (prev_forward_prob(1, :) * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
+        forward_prob = next_forward_prob;
+    else
+        next_forward_prob = (prev_forward_prob(n - 1, :) * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
+        forward_prob = cat(1, prev_forward_prob, next_forward_prob);
+    end
     
-    clear index prev_forward_prob;
+    new_data(n, 1) = argmax(forward_prob(n, :)) - 1;
+    
+    clear index prev_forward_prob next_forward_prob;
     
     if n ~= datasize
         if ~supressOutput

@@ -61,3 +61,9 @@ fStates = figure('Name','Trained Occupancy States','NumberTitle','off');
 % plot the real motion sensor observations
 fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 [smrPlotObs, falPlotObs, wtrPlotObs] = statePlot(data, data(:, 1), Sn, Hn, Wn);
+
+%% prediction result
+
+[accuracy, predictions] = testPrediction(data, Sn, Hn, Wn)
+
+fprintf('Predict accuracy is %f\n', accuracy);

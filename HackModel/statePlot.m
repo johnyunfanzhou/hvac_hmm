@@ -8,19 +8,10 @@ function [smrPlot, falPlot, wtrPlot] = statePlot(data, state, Sn, Hn, Wn)
     
     datasize = size(data, 1);
     
-    % check if data is valid
-    for i = 1 : datasize
-        if data(i, 1) >= 2
-            error('Invalid Occupancy state/observation.');
-        elseif data(i, 2) >= Sn
-            error('Invalid Season value.');
-        elseif data(i, 3) >= Hn
-            error('Invalid Hour value.');
-        elseif data(i, 4) >= Wn
-            error('Invalid Weekday/Weekend value.');
-        else
-            continue;
-        end
+    hvaccheckdata(data, Sn, Hn, Wn);
+    
+    if size(state, 1) ~= datasize
+        error('Length of state must match length of data.');
     end
     
     smrWday = zeros(Hn, 1);

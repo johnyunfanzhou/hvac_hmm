@@ -1,6 +1,7 @@
 % HVAC_HMM "Hack" model using time-shifting
 % Please set the Current Folder to hvac_hmm
 % Please locate formed_data in the parent directory of hvac_hmm
+
 addpath(genpath('../formed_data'));
 addpath(genpath('./HMMall'));
 addpath(genpath('./HackModel'));
@@ -38,11 +39,9 @@ filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv';
 
 %% store all data in a matrix
 
-data = csvread(filename(1, :), 1, 1);
-for i = 2 : size(filename, 1)
-    data = cat(1, data, csvread(filename(i, :), 1, 1));
-end
-clear i;
+file_index = 1;
+
+data = csvread(filename(file_index, :), 1, 1);
 
 %% learn data with HackModel.m
 
@@ -64,6 +63,19 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-[accuracy, predictions] = testPrediction(data, Sn, Hn, Wn)
-
+[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn);
 fprintf('Predict accuracy is %f\n', accuracy);
+
+%% save figures (optional)
+
+% cd 'Hack Model Results';
+% dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
+% mkdir(dirname);
+% cd(dirname);
+% fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
+% fprintf(fileID, 'Data size is %d\nPredict accuracy is %f\n', size(data, 1), accuracy);
+% fclose(fileID);
+% saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));
+% saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
+% saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
+% saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));

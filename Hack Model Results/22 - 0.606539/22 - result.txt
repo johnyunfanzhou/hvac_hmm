@@ -1,0 +1,2 @@
+Data size is 17984
+Predict accuracy is 0.606539

@@ -1,0 +1,16 @@
+This folder contain all the results generated from training and prediction testing of the 25 .csv files.
+Result generated from each file is saved in an individual folder, with the name "FILEINDEX - TESTACCURACY".
+
+Inside each folder there are 5 files:
+
+>> A "FILEINDEX - result.txt" file with the number of entries in the data and the prediction test accuracy
+
+>> A "FILEINDEX - Motion Sensor Observations.png" figure showing the probability of observing a "true" in the original motion sensor observations (original data)
+
+>> A "FILEINDEX - Trained Occupancy States.png" figure showing the probability of the hidden occupancy states being "true", where the hidden occupancy states are generated after the training of data
+
+>> A "FILEINDEX - Discrete Predictions.png" figure showing the predictions generated with the prediction testing (0 or 1)
+
+>> A "FILEINDEX - Forward Probabilities" figure showing the probability of the next motion sensor observation being "true" during the predictions, which also leads to the conclusions in the Discrete Predicitons
+
+Note that in all figures, the X-axis represents the hour of the day (0 to 48). The red line represents weekdays, and the blue line represent weekends.

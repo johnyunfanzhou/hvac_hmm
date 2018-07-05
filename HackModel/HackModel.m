@@ -46,8 +46,12 @@ function [A, B, state] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput
         % viterbi to find new states
         oldstate = state;
         state = hvacviterbi(data, A, B, Sn, Hn, Wn);
+        state_changed = sum(abs(state - oldstate));
         if ~supressOutput
-            fprintf('Iteration %d: %d state(s) changed\n', iteration, sum(abs(state - oldstate)));
+            fprintf('Iteration %d: %d state(s) changed\n', iteration, state_changed);
+        end
+        if state_changed == 0
+            break;
         end
     end
 end

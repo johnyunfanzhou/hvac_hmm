@@ -70,6 +70,6 @@ function [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data, S
         if ~supressOutput
             fprintf('Observation #%d generated.\n', n);
         end
-        [new_data, forward_prob] = hvacpredict(forward_prob, A, B, new_data, Sn, Hn, Wn, n + 1, false, true);
+        [new_data, forward_prob] = hvacpredict(forward_prob, A, B, new_data, Sn, Hn, Wn, n + 1, supressOutput, true);
     end
 end

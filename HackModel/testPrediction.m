@@ -1,9 +1,12 @@
-function [accuracy, predictions, A, B, state] = testPrediction(data, Sn, Hn, Wn, separator, maxIteration)
+function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, separator, maxIteration, supressOutput)
     
-    if nargin < 6
-        maxIteration = 10;
-        if nargin < 5
-            separator = 0.75;
+    if nargin < 7
+        supressOutput = true;
+        if nargin < 6
+            maxIteration = 10;
+            if nargin < 5
+                separator = 0.75;
+            end
         end
     end
 
@@ -18,15 +21,15 @@ function [accuracy, predictions, A, B, state] = testPrediction(data, Sn, Hn, Wn,
     
     prev_forward_prob = [data(s_index, 1) == 0, data(s_index, 1) == 1];
     
-    [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn);
+    [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn, 1, supressOutput);
     
     predictions = new_data(:, 1);
     
     accuracy = 1 - sum(abs(predictions - data(testdata, 1)))/(datasize - s_index);
     
-    figure('Name','Discrete Predictions','NumberTitle','off');
+    fPred = figure('Name','Discrete Predictions','NumberTitle','off');
     statePlot(data(testdata, :), predictions, Sn, Hn, Wn);
     
-    figure('Name', 'Forward Probabilities', 'NumberTitle', 'off');
+    fProb = figure('Name', 'Forward Probabilities', 'NumberTitle', 'off');
     forwardProbPlot(data(testdata, :), forward_prob, Sn, Hn, Wn);
 end

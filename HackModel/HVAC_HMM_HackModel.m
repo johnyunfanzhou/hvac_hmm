@@ -2,6 +2,7 @@
 % Please set the Current Folder to hvac_hmm
 % Please locate formed_data in the parent directory of hvac_hmm
 
+cd '/Users/john_zhou/Desktop/2018 Summer/hvac_hmm_root'
 addpath(genpath('../formed_data'));
 addpath(genpath('./HMMall'));
 addpath(genpath('./HackModel'));
@@ -63,12 +64,18 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn);
+rand = false; % toggle this for cluster/random predictions
+
+[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, rand);
 fprintf('Predict accuracy is %f\n', accuracy);
 
-%% save figures (optional)
+%% save figures (comment if already saved)
 
-% cd 'Hack Model Results';
+% if rand
+%     cd 'HackModel/results/random predictions';
+% else
+%     cd 'HackModel/results/cluster predictions';
+% end
 % dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
 % mkdir(dirname);
 % cd(dirname);

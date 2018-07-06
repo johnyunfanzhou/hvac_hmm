@@ -1,11 +1,14 @@
-function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, separator, maxIteration, supressOutput)
+function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, rand, testPercentage, maxIteration, supressOutput)
     
-    if nargin < 7
+    if nargin < 8
         supressOutput = true;
-        if nargin < 6
+        if nargin < 7
             maxIteration = 10;
-            if nargin < 5
-                separator = 0.75;
+            if nargin < 6
+                testPercentage = 0.25;
+                if nargin < 5
+                    rand = false;
+                end
             end
         end
     end
@@ -13,23 +16,43 @@ function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(dat
     hvaccheckdata(data, Sn, Hn, Wn);
     
     datasize = size(data, 1);
-    s_index = max(datasize - 17520, round(separator * datasize));
-    traindata = 1 : s_index;
-    testdata = s_index + 1 : datasize;
-
-    [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
+    testsize = min(17520, round(testPercentage * datasize));
     
-    prev_forward_prob = [data(s_index, 1) == 0, data(s_index, 1) == 1];
-    
-    [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data(testdata, :), Sn, Hn, Wn, 1, supressOutput);
-    
-    predictions = new_data(:, 1);
-    
-    accuracy = 1 - sum(abs(predictions - data(testdata, 1)))/(datasize - s_index);
+    if rand
+        alldata = 1 : datasize;
+        allaccuracy = zeros(30, 1);
+        avgpredictions = zeros(datasize, 1);
+        countpredictions = zeros(datasize, 1);
+        avgforward_prob = zeros(datasize, 2);
+        countforward_prob = zeros(datasize, 1);
+        for trial = 1 : 30
+            testdata = sort(randperm(datasize, testsize));
+            traindata = alldata(~ismember(alldata, testdata));
+            [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
+            [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, testdata, supressOutput);
+            predictions = new_data(:, 1);
+            allaccuracy(trial) = 1 - sum(abs(predictions(testdata) - data(testdata, 1)))/testsize;
+            avgpredictions(testdata) = avgpredictions(testdata) + predictions(testdata);
+            countpredictions(testdata) = countpredictions(testdata) + 1;
+            avgforward_prob(testdata, :) = avgforward_prob(testdata, :) + forward_prob(testdata, :);
+            countforward_prob(testdata) = countforward_prob(testdata) + 1;
+        end
+        accuracy = mean(allaccuracy);
+        predictions = avgpredictions ./ max(countpredictions, ones(datasize, 1));
+        forward_prob = avgforward_prob ./ max(countforward_prob, ones(datasize, 1));
+        clear alldata allaccuracy avgpredictions countpredictions avgforward_prob countforward_prob;
+    else
+        traindata = 1 : datasize - testsize;
+        testdata = datasize - testsize + 1 : datasize;
+        [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
+        [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, testdata, supressOutput);
+        predictions = new_data(:, 1);
+        accuracy = 1 - sum(abs(predictions(testdata) - data(testdata, 1)))/testsize;
+    end
     
     fPred = figure('Name','Discrete Predictions','NumberTitle','off');
-    statePlot(data(testdata, :), predictions, Sn, Hn, Wn);
+    statePlot(data(testdata, :), predictions(testdata), Sn, Hn, Wn);
     
     fProb = figure('Name', 'Forward Probabilities', 'NumberTitle', 'off');
-    forwardProbPlot(data(testdata, :), forward_prob, Sn, Hn, Wn);
+    forwardProbPlot(data(testdata, :), forward_prob(testdata, :), Sn, Hn, Wn);
 end

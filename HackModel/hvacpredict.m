@@ -1,28 +1,37 @@
-function [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data, Sn, Hn, Wn, n, supressOutput, abortCheck)
+function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, supressOutput, forward_prob, abortCheck)
     
+    datasize = size(data, 1);
+    nsize = size(narray, 2);
+
     if nargin < 10
         abortCheck = false;
         if nargin < 9
-            supressOutput = false;
+            forward_prob = zeros(datasize, 2);
             if nargin < 8
-                n = 1;
+                supressOutput = false;
             end
         end
     end
     
-    datasize = size(data, 1);
-    
-    % check if inputs are valid
+    % check if inputs are valid (only once)
     if ~abortCheck
-        if datasize - n > 17519
-            data = data(1 : n + 17519, :);
+        if nsize > 17520
+            warning("Size of prediction is larger than 17520 and may cause insufficient memory.");
         end
-        if size(prev_forward_prob, 2) ~= 2
-            error('Invalid probability vector size. Previous forward probabily has to be size nx2.');
+        if ~isequal(size(forward_prob), [datasize, 2])
+            error('Invalid probability vector size. Previous forward probabily has to be size datasizex2.');
         end
         hvaccheckmatrix(A, B, Sn, Hn, Wn);
         hvaccheckdata(data, Sn, Hn, Wn);
+        disp('Autogenerating existing forward probabilities.');
+        for i = 1 : datasize
+            if ~ismember(i, narray)
+                forward_prob(i, :) = [data(i, 1) == 0, data(i, 1) == 1];
+            end
+        end
     end
+    
+    n = narray(1);
     
     % check if data is continuous or not
     datacontinuous = true;
@@ -52,24 +61,24 @@ function [new_data, forward_prob] = hvacpredict(prev_forward_prob, A, B, data, S
 
     index = 2 * (h + Hn * (w + Wn * s)) + 1 : 2 * (h + Hn * (w + Wn * s)) + 2;
     
-    clear abortCheck datacontinuous data;
+    clear abortCheck datacontinuous data prev_forward_prob;
     
     if n == 1
-        next_forward_prob = (prev_forward_prob(1, :) * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
-        forward_prob = next_forward_prob;
+        warning('Predicting first entry. Previous forward probability is assumed [0.5, 0.5].');
+        forward_prob(n, :) = ([0.5, 0.5] * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
     else
-        next_forward_prob = (prev_forward_prob(n - 1, :) * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
-        forward_prob = cat(1, prev_forward_prob, next_forward_prob);
+        forward_prob(n, :) = (forward_prob(n - 1, :) * (B(index, :) ./ sum(B(index, :)))') * A(index, :) * B(index, :);
     end
     
     new_data(n, 1) = argmax(forward_prob(n, :)) - 1;
     
-    clear index prev_forward_prob next_forward_prob;
+    clear index;
     
-    if n ~= datasize
-        if ~supressOutput
-            fprintf('Observation #%d generated.\n', n);
-        end
-        [new_data, forward_prob] = hvacpredict(forward_prob, A, B, new_data, Sn, Hn, Wn, n + 1, supressOutput, true);
+    if ~supressOutput
+        fprintf('Observation #%d generated.\n', n);
+    end
+    
+    if nsize ~= 1
+        [new_data, forward_prob] = hvacpredict(A, B, new_data, Sn, Hn, Wn, narray(2:nsize), supressOutput, forward_prob, true);
     end
 end

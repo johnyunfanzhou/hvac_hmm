@@ -1,6 +1,9 @@
 This folder contain all the results generated from training and prediction testing of the 25 .csv files.
 Result generated from each file is saved in an individual folder, with the name "FILEINDEX - TESTACCURACY".
 
+Each file is trained using the first 75% of data, and tested using the last 25% of data. The clustering of testing data may cause insufficient training for a specific season, which is likely to be tested on, and result in poor testing accuracies.
+An alternative version of prediction testing using randomly choosed testing data is under development.
+
 Inside each folder there are 5 files:
 
 >> A "FILEINDEX - result.txt" file with the number of entries in the data and the prediction test accuracy

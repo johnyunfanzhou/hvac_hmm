@@ -1,4 +1,4 @@
-function [A, B, state] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput)
+function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput)
     
     % supress output
 
@@ -51,8 +51,10 @@ function [A, B, state] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput
             fprintf('Iteration %d: %d state(s) changed\n', iteration, state_changed);
         end
         if state_changed == 0
+            itr = iteration;
             break;
         end
     end
+    itr = maxIteration;
 end
 

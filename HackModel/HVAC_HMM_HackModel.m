@@ -2,7 +2,6 @@
 % Please set the Current Folder to hvac_hmm
 % Please locate formed_data in the parent directory of hvac_hmm
 
-cd '/Users/john_zhou/Desktop/2018 Summer/hvac_hmm_root'
 addpath(genpath('../formed_data'));
 addpath(genpath('./HMMall'));
 addpath(genpath('./HackModel'));
@@ -40,7 +39,7 @@ filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv';
 
 %% store all data in a matrix
 
-file_index = 1;
+file_index = 2;
 
 data = csvread(filename(file_index, :), 1, 1);
 
@@ -50,7 +49,7 @@ Sn = 3;
 Wn = 2;
 Hn = 48;
 
-[A, B, state] = HackModel(data, Sn, Hn, Wn);
+[A, B, state, itr] = HackModel(data, Sn, Hn, Wn);
 
 %% result summary
 
@@ -64,25 +63,28 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-rand = false; % toggle this for cluster/random predictions
+rand = true; % toggle this for cluster/random predictions
 
 [accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, rand);
 fprintf('Predict accuracy is %f\n', accuracy);
 
 %% save figures (comment if already saved)
 
-% if rand
-%     cd 'HackModel/results/random predictions';
-% else
-%     cd 'HackModel/results/cluster predictions';
-% end
-% dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
-% mkdir(dirname);
-% cd(dirname);
-% fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
-% fprintf(fileID, 'Data size is %d\nPredict accuracy is %f\n', size(data, 1), accuracy);
-% fclose(fileID);
-% saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));
-% saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
-% saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
-% saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));
+if rand
+    cd 'HackModel/results/random predictions';
+else
+    cd 'HackModel/results/cluster predictions';
+end
+dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
+mkdir(dirname);
+cd(dirname);
+fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
+fprintf(fileID, 'Data size is %d\n', size(data, 1));
+fprintf(fileID, 'Training convergence reached after iteration %d\n', itr);
+fprintf(fileID, 'Predict accuracy is %f\n', accuracy);
+fclose(fileID);
+saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));
+saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
+saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
+saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));
+cd '../../../..';

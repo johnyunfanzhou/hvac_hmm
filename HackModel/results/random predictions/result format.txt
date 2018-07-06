@@ -1,11 +1,11 @@
 This folder contain all the results generated from training and prediction testing of the 25 .csv files.
 Result generated from each file is saved in an individual folder, with the name "FILEINDEX - TESTACCURACY".
 
-Each file is trained using the first 75% of data, and tested using the last 25% of data. The clustering of testing data may cause insufficient training for a specific season, which is likely to be tested on, and result in poor testing accuracies.
+Each file is trained using random 75% of data, and tested using the rest 25% of data. The random selection of training data could result in more data discontinuities, which may negatively affect the testing accuracy.
 
 Inside each folder there are 5 files:
 
->> A "FILEINDEX - result.txt" file with the number of entries in the data and the prediction test accuracy
+>> A "FILEINDEX - result.txt" file with the number of entries in the data, number of iterations to reach absolute convergence, and the prediction test accuracy
 
 >> A "FILEINDEX - Motion Sensor Observations.png" figure showing the probability of observing a "true" in the original motion sensor observations (original data)
 

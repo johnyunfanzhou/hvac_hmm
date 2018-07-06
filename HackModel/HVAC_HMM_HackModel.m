@@ -39,7 +39,7 @@ filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv';
 
 %% store all data in a matrix
 
-file_index = 2;
+file_index = 25;
 
 data = csvread(filename(file_index, :), 1, 1);
 
@@ -80,7 +80,11 @@ mkdir(dirname);
 cd(dirname);
 fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
 fprintf(fileID, 'Data size is %d\n', size(data, 1));
-fprintf(fileID, 'Training convergence reached after iteration %d\n', itr);
+if itr == 11
+    fprintf(fileID, 'Absolute convergence not reached after max number of iterations\n');
+else
+    fprintf(fileID, 'Absolute convergence reached after iteration %d\n', itr);
+end
 fprintf(fileID, 'Predict accuracy is %f\n', accuracy);
 fclose(fileID);
 saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));

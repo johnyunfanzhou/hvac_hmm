@@ -22,7 +22,7 @@ function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressO
     A = ones (N, 2);
     B = ones (N, 2);
     
-    itr = maxIteration;
+    itr = maxIteration + 1;
     % loop
     for iteration = 1 : maxIteration
         % set A and B according to conditional probability

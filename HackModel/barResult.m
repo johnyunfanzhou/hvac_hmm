@@ -8,18 +8,18 @@ exclusions = ['.', '..', '.DS_Store', 'result format.txt'];
 
 clusData.x = zeros(25, 1);
 clusData.y = zeros(25, 1);
-for i = 4 : 28
+for i = 3 : 27
     v = split(clusP(i).name, ' - ');
-    clusData.x(i - 3) = str2double(v{1});
-    clusData.y(i - 3) = str2double(v{2});
+    clusData.x(i - 2) = str2double(v{1});
+    clusData.y(i - 2) = str2double(v{2});
 end
 
 randData.x = zeros(25, 1);
 randData.y = zeros(25, 1);
-for i = 4 : 28
+for i = 3 : 27
     v = split(randP(i).name, ' - ');
-    randData.x(i - 3) = str2double(v{1});
-    randData.y(i - 3) = str2double(v{2});
+    randData.x(i - 2) = str2double(v{1});
+    randData.y(i - 2) = str2double(v{2});
 end
 
 y = zeros(25, 2);

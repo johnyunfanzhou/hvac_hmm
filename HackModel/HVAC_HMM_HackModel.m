@@ -39,9 +39,12 @@ filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv';
 
 %% store all data in a matrix
 
-file_index = 25;
+file_index = 1;
 
 data = csvread(filename(file_index, :), 1, 1);
+
+datacell = textscan(fopen(filename(file_index, :)), '%s', 'Delimiter', '\n');
+datacell = datacell{1}(2 : end);
 
 %% learn data with HackModel.m
 
@@ -63,32 +66,34 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-rand = true; % toggle this for cluster/random predictions
-
-[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, rand);
+mode = 'rand'; % 'rand': randomly select test data
+               % 'clus': select the last cluster of data as test data
+               % 'days': select random days for testing
+[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, mode);
 fprintf('Predict accuracy is %f\n', accuracy);
 
 %% save figures (comment if already saved)
 
-if rand
-    cd 'HackModel/results/random predictions';
-else
-    cd 'HackModel/results/cluster predictions';
-end
-dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
-mkdir(dirname);
-cd(dirname);
-fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
-fprintf(fileID, 'Data size is %d\n', size(data, 1));
-if itr == 11
-    fprintf(fileID, 'Absolute convergence not reached after max number of iterations\n');
-else
-    fprintf(fileID, 'Absolute convergence reached after iteration %d\n', itr);
-end
-fprintf(fileID, 'Predict accuracy is %f\n', accuracy);
-fclose(fileID);
-saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));
-saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
-saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
-saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));
-cd '../../../..';
+% if rand
+%     cd 'HackModel/results/random predictions';
+% else
+%     cd 'HackModel/results/cluster predictions';
+% end
+% cd 'HackModel/results/tts_day predictions';
+% dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
+% mkdir(dirname);
+% cd(dirname);
+% fileID = fopen(cat(2, int2str(file_index), ' - result.txt'), 'w');
+% fprintf(fileID, 'Data size is %d\n', size(data, 1));
+% if itr == 11
+%     fprintf(fileID, 'Absolute convergence not reached after max number of iterations\n');
+% else
+%     fprintf(fileID, 'Absolute convergence reached after iteration %d\n', itr);
+% end
+% fprintf(fileID, 'Predict accuracy is %f\n', accuracy);
+% fclose(fileID);
+% saveas(fStates, cat(2, int2str(file_index), ' - Trained Occupancy States.png'));
+% saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
+% saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
+% saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));
+% cd '../../../..';

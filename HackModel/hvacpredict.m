@@ -15,15 +15,20 @@ function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, 
     
     % check if inputs are valid (only once)
     if ~abortCheck
+        if nsize < 1
+            error('No data to predict.');
+        end
         if nsize > 17520
-            warning("Size of prediction is larger than 17520 and may cause insufficient memory.");
+            warning('Size of prediction is larger than 17520 and may cause insufficient memory.');
         end
         if ~isequal(size(forward_prob), [datasize, 2])
             error('Invalid probability vector size. Previous forward probabily has to be size datasizex2.');
         end
         hvaccheckmatrix(A, B, Sn, Hn, Wn);
         hvaccheckdata(data, Sn, Hn, Wn);
-        disp('Autogenerating existing forward probabilities.');
+        if ~supressOutput
+            disp('Autogenerating existing forward probabilities.');
+        end
         for i = 1 : datasize
             if ~ismember(i, narray)
                 forward_prob(i, :) = [data(i, 1) == 0, data(i, 1) == 1];

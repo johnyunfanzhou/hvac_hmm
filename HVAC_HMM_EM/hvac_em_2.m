@@ -27,9 +27,11 @@ test_files = ["test_1cca90adb7de8aabbb74be37171e805ba6dd74e8.csv"
                 ,"test_f411422c063f9d0809def300e7657a9f6d63b1ef.csv"
                 ,"test_f6178010526fce4bebc535194b3ccc6c9ebe19ad.csv"];
 
-accuracy_total = zeros(1,size(test_files));
+accuracy_total = zeros(1,size(test_files,1));
+err_per_day_total = [];
+g = [];
 
-for file_index = 1:1
+for file_index = 1:25
     %% Initialization
 %     clear;
 %     clc;
@@ -40,6 +42,9 @@ for file_index = 1:1
     train_data = train_data_raw{file_index};% data from the first/ 25th csv file
     test_data_raw = importdata('sample_test_data.mat');
     test_data = test_data_raw{file_index};
+    days_data_raw = importdata('sample_days_data.mat');
+    days_data = days_data_raw{file_index};
+    
     [M,S,H,W] = deal(zeros(1,size(test_data,2)));
     for i = 1:size(test_data,2)
         [M(i),S(i),H(i),W(i)] = extrac_num(test_data(i));
@@ -134,6 +139,7 @@ for file_index = 1:1
             best_obsmat2 = obsmat2;
         end
     end
+    
     accuracy_total(i) = best_accuracy;
     figure(1);
     subplot(3,1,1);
@@ -146,8 +152,25 @@ for file_index = 1:1
     subplot(3,1,3);
     plot(M)
     title('True Observation Sequence (M)');
-    saveas(gcf, strcat(test_files(file_index),'.jpg'));
+%     saveas(gcf, strcat(test_files(file_index),'.jpg'));
     
     %% Error Analysis
-    
+    err_per_day = zeros(1,size(days_data,2));
+    j = 1;
+    while j <= size(error,2)
+        for i = 1:size(days_data,2)
+            err_per_day(i) = sum(error(j:(j+days_data(i)-1)));
+            j = j + days_data(i);
+        end
+    end
+%     if size(err_per_day,2) == 20
+%         err_per_day_total(:,file_index) = err_per_day';
+%     end
+    err_per_day_total = [err_per_day_total, err_per_day];
+    g = [g, file_index * ones(1,size(days_data,2))];
 end
+%% Box Plot
+figure(2);
+boxplot(err_per_day_total,g);
+xlabel('Test Files');
+ylabel('Errors per Day');

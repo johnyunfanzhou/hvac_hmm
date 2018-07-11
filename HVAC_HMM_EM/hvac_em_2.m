@@ -35,7 +35,6 @@ for file_index = 1:25
     %% Initialization
 %     clear;
 %     clc;
-    
 
 %     file_index = num_file;
     train_data_raw = importdata('sample_train_data.mat');
@@ -140,7 +139,7 @@ for file_index = 1:25
         end
     end
     
-    accuracy_total(i) = best_accuracy;
+    accuracy_total(file_index) = best_accuracy;
     figure(1);
     subplot(3,1,1);
     plot(best_state_seq)
@@ -169,8 +168,14 @@ for file_index = 1:25
     err_per_day_total = [err_per_day_total, err_per_day];
     g = [g, file_index * ones(1,size(days_data,2))];
 end
-%% Box Plot
+%% Box Plot for Error
 figure(2);
 boxplot(err_per_day_total,g);
 xlabel('Test Files');
 ylabel('Errors per Day');
+%% Bar Graph for Accuracy
+figure(3);
+bar(accuracy_total,0.6);
+xlabel('Test Files');
+ylabel('Accuracy');
+set(gca,'XTick',1:1:25);

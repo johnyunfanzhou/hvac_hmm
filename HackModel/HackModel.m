@@ -19,6 +19,7 @@ function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressO
     N = Sn * Wn * Hn * 2;
 
     % state transition matrix (A) and observation probability matrix (B)
+    % use ones to achieve laplace smoothing
     A = ones (N, 2);
     B = ones (N, 2);
     
@@ -31,13 +32,14 @@ function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressO
             h = data(i, 3);
             w = data(i, 4);
             o = state(i);
-            index = o + 2 * (h + Hn * (w + Wn * s)) + 1;
-            if (i ~= datasize)
-                o_next = state(i + 1) + 1;
-                A(index, o_next) = A(index, o_next) + 1;
+            if i ~= 1
+                o_prev = state(i - 1);
+                index = o_prev + 2 * (h + Hn * (w + Wn * s)) + 1;
+                A(index, o + 1) = A(index, o + 1) + 1;
             end
-            m = data(i, 1) + 1;
-            B(index, m) = B(index, m) + 1;
+            index = o + 2 * (h + Hn * (w + Wn * s)) + 1;
+            m = data(i, 1);
+            B(index, m + 1) = B(index, m + 1) + 1;
         end
 
         % normalized matrices

@@ -91,28 +91,10 @@ vOld = v;
 
 %% loop through the model
 for count = 1:L
-    % check if data is continuous or not
-    datacontinuous = true;
-    if count == 1
-        datacontinuous = false;
-    elseif mod(data(count, 3) - data(count - 1, 3), 48) ~= 1
-        datacontinuous = false;
-    elseif data(count, 3) ~= 0
-        if data(count, 2) ~= data(count - 1, 2)
-            datacontinuous = false;
-        elseif data(count, 4) ~= data(count - 1, 4)
-            datacontinuous = false;
-        end
-    end
-    if datacontinuous
-        s = data(count - 1, 2);
-        h = mod(data(count - 1, 3), Hn);
-        w = data(count - 1, 4);
-    else
-        s = data(count, 2);
-        h = mod(data(count, 3) - 1, Hn);
-        w = data(count, 4);
-    end
+    s = data(count, 2);
+    h = data(count, 3);
+    w = data(count, 4);
+
     for state = 1:2
         % for each state we calculate
         % v(state) = e(state,seq(count))* max_k(vOld(:)*tr(k,state));

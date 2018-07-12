@@ -1,3 +1,0 @@
-Data size is 18380
-Training convergence reached after iteration 5
-Predict accuracy is 0.780725

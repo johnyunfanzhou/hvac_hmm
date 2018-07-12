@@ -38,29 +38,9 @@ function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, 
     
     n = narray(1);
     
-    % check if data is continuous or not
-    datacontinuous = true;
-    if n == 1
-        datacontinuous = false;
-    elseif mod(data(n, 3) - data(n - 1, 3), 48) ~= 1
-        datacontinuous = false;
-    elseif data(n, 3) ~= 0
-        if data(n, 2) ~= data(n - 1, 2)
-            datacontinuous = false;
-        elseif data(n, 4) ~= data(n - 1, 4)
-            datacontinuous = false;
-        end
-    end
-    
-    if datacontinuous
-        s = data(n - 1, 2);
-        h = data(n - 1, 3);
-        w = data(n - 1, 4);
-    else
-        s = data(n, 2);
-        h = data(n, 3) - 1;
-        w = data(n, 4);
-    end
+    s = data(n, 2);
+    h = data(n, 3);
+    w = data(n, 4);
     
     new_data = data;
 

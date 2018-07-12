@@ -9,7 +9,7 @@
 % 
 % 2. Construct the transition and emission matrices using Naive Bayes with
 % Laplace Smoothing
-%
+% 
 %                               # occurance of "next_state|curr_state" + 1
 %   A(curr_state, next_state) = ------------------------------------------
 %                                    # occurance of "curr_state" + 2
@@ -19,13 +19,13 @@
 %                                 # occurance of "state" + 2
 % 
 % 
-%   Note: the transition matrix is 4 * 48 * 2 individual 2 * 2 matrices.
+%   Note: the transition matrix is 3 * 48 * 2 individual 2 * 2 matrices.
 %   The transition matrix depends on the value of S, H, and W.
 % 
 % 3. Using Viterbi algorithm (hvacviterbi.m) to update the most probable
 % sequence of true occupancy states given the sequence of observations, the
 % transition matrix and the emission matrix.
-%
+% 
 %   Note: The transition matrix used to calculate the likelihood of a state
 %   depends on the S, H, and W of the previous timestep. If discontinuous
 %   data is detected, an approximation is used in determining them:
@@ -41,6 +41,6 @@
 %       iii. h is not 0 (it is not the starting of a day) but season or
 %            weekday/weekend has changed, meaning we probably skipped
 %            exactly one day
-%
+% 
 % 4. Step 2 and 3 are repeated using the most probable sequence of true
 % occupancy states generated from the last iteration.

@@ -9,7 +9,7 @@ addpath(genpath('./HackModel'));
 %% initialization
 
 % list of filenames
-filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv'; 
+filename1 = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv'; 
     '5a582fd2839fc31dbc553389cf8e65b8b845aa7c.csv'; 
     '6d195551c1ef0ca9bf855903cdfd9dd6b71a6ff5.csv';
     '7a805f75e7a914388de0fb8308227c7ba627271c.csv';
@@ -35,7 +35,7 @@ filename = ['1d0733906f57440ecade6f8d3f091630de8c24ec.csv';
     'f17826dce7c323c15e8f1e91cb7543f10b09520d.csv';
     'fb4d3fa98447464e0d38ba15b6928ed5ca072eef.csv'];
 
-filename_tts = ['1cca90adb7de8aabbb74be37171e805ba6dd74e8.csv'; 
+filename2 = ['1cca90adb7de8aabbb74be37171e805ba6dd74e8.csv'; 
     '2cceb7f426f847d09f9c4d15808e24884bb3dbf8.csv'; 
     '02d4dbbdec6d776bf72ef3ee530ef2de918ce363.csv';
     '7d9bf619d6d3c19e16ef6702a90f816fccee5786.csv';
@@ -65,9 +65,9 @@ filename_tts = ['1cca90adb7de8aabbb74be37171e805ba6dd74e8.csv';
 
 %% store all data in a matrix
 
-file_index = 2;
+file_index = 1;
 
-data = csvread(filename(file_index, :), 1, 1);
+data = csvread(filename1(file_index, :), 1, 1);
 
 % To detect number of toggled observations
 % c = 0;
@@ -109,9 +109,9 @@ fprintf('Predict accuracy is %f\n', accuracy);
 %% save figures (comment if already saved)
 
 % if rand
-%     cd 'HackModel/results/random predictions';
+%     cd 'HackModel/results/tts_1/random predictions';
 % else
-%     cd 'HackModel/results/cluster predictions';
+%     cd 'HackModel/results/tts_1/cluster predictions';
 % end
 % dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
 % mkdir(dirname);

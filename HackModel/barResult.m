@@ -1,31 +1,35 @@
 addpath(genpath('./'));
-clusP = dir('./HackModel/results/random predictions');
-randP = dir('./HackModel/results/cluster predictions');
+clusP = dir('./HackModel/results/tts_2/cluster predictions');
+randP = dir('./HackModel/results/tts_2/random predictions');
 % clusP = dir('./HackModel/results/tts_day predictions/random predictions');
 % randP = dir('./HackModel/results/tts_day predictions/cluster predictions');
 
 exclusions = ['.', '..', '.DS_Store', 'result format.txt'];
 
-clusData.x = zeros(25, 1);
-clusData.y = zeros(25, 1);
-for i = 3 : 27
-    v = split(clusP(i).name, ' - ');
-    clusData.x(i - 2) = str2double(v{1});
-    clusData.y(i - 2) = str2double(v{2});
+clusData.x = [];
+clusData.y = [];
+for i = 1 : size(clusP)
+    if ~contains(exclusions, clusP(i).name)
+        v = split(clusP(i).name, ' - ');
+        clusData.x = [clusData.x, str2double(v{1})];
+        clusData.y = [clusData.y, str2double(v{2})];
+    end
 end
 
-randData.x = zeros(25, 1);
-randData.y = zeros(25, 1);
-for i = 3 : 27
-    v = split(randP(i).name, ' - ');
-    randData.x(i - 2) = str2double(v{1});
-    randData.y(i - 2) = str2double(v{2});
+randData.x = [];
+randData.y = [];
+for i = 1 : size(randP)
+    if ~contains(exclusions, randP(i).name)
+        v = split(randP(i).name, ' - ');
+        randData.x = [randData.x, str2double(v{1})];
+        randData.y = [randData.y, str2double(v{2})];
+    end
 end
 
 y = zeros(25, 2);
 for i = 1 : 25
-    y(clusData.x(i), 2) = clusData.y(i);
-    y(randData.x(i), 1) = randData.y(i);
+    y(clusData.x(i), 1) = clusData.y(i);
+    y(randData.x(i), 2) = randData.y(i);
 end
 
 fBar = figure('Name','Accuracy of Prediction Testing','NumberTitle','off');

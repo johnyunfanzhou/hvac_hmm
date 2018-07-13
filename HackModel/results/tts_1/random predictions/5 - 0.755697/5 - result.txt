@@ -1,0 +1,3 @@
+Data size is 17914
+Absolute convergence reached after iteration 8
+Predict accuracy is 0.755697

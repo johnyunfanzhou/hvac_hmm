@@ -77,9 +77,6 @@ data = csvread(filename1(file_index, :), 1, 1);
 %     end
 % end
 
-datacell = textscan(fopen(filename(file_index, :)), '%s', 'Delimiter', '\n');
-datacell = datacell{1}(2 : end);
-
 %% learn data with HackModel.m
 
 Sn = 3;
@@ -100,7 +97,7 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-mode = 'clus'; % 'rand': randomly select test data
+mode = 'rand'; % 'rand': randomly select test data
                % 'clus': select the last cluster of data as test data
 
 [accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, mode);
@@ -108,10 +105,12 @@ fprintf('Predict accuracy is %f\n', accuracy);
 
 %% save figures (comment if already saved)
 
-% if rand
-%     cd 'HackModel/results/tts_1/random predictions';
+% if isequal(mode, 'rand')
+%     cd 'HackModel/results/tts_2/random predictions';
+% elseif isequal(mode, 'clus')
+%     cd 'HackModel/results/tts_2/cluster predictions';
 % else
-%     cd 'HackModel/results/tts_1/cluster predictions';
+%     error('Unrecognized prediction mode.');
 % end
 % dirname = cat(2, int2str(file_index), cat(2, ' - ', num2str(accuracy, '%6f')));
 % mkdir(dirname);
@@ -129,4 +128,4 @@ fprintf('Predict accuracy is %f\n', accuracy);
 % saveas(fObs, cat(2, int2str(file_index), ' - Motion Sensor Observations.png'));
 % saveas(fPred, cat(2, int2str(file_index), ' - Discrete Predictions.png'));
 % saveas(fProb, cat(2, int2str(file_index), ' - Forward Probabilities.png'));
-% cd '../../../..';
+% cd '../../../../..';

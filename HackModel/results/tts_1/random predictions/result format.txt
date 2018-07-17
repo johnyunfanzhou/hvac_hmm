@@ -13,6 +13,6 @@ Inside each folder there are 5 files:
 
 >> A "FILEINDEX - Discrete Predictions.png" figure showing the predictions generated with the prediction testing (0 or 1)
 
->> A "FILEINDEX - Forward Probabilities" figure showing the probability of the next motion sensor observation being "true" during the predictions, which also leads to the conclusions in the Discrete Predicitons
+>> A "FILEINDEX - Forward Probabilities.png" figure showing the probability of the next motion sensor observation being "true" during the predictions, which also leads to the conclusions in the Discrete Predicitons
 
 Note that in all figures, the X-axis represents the hour of the day (0 to 48). The red line represents weekdays, and the blue line represent weekends.

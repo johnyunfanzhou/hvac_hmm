@@ -73,7 +73,7 @@ data = csvread(filename1(file_index, :), 1, 1);
 datasize = size(data, 1);
 datacell = textscan(fopen(filename1(file_index, :)), '%s', 'Delimiter', '\n');
 datacell = datacell{1}(2 : end);
-testcell = textscan(fopen(['test_', filename1(file_index, :)]), '%s', 'Delimiter', '\n');
+testcell = textscan(fopen(['test2_', filename1(file_index, :)]), '%s', 'Delimiter', '\n');
 testcell = testcell{1}(2 : end);
 testsize = size(testcell, 1);
 testdays = cell(0);
@@ -140,5 +140,8 @@ fprintf('Average predict error is %f\n', mean(err));
 
 fErr = figure('Name','Number of prediction errors','NumberTitle','off');
 boxplot(err, g);
+ylim([0, 48]);
 xlabel('Errors');
 ylabel('File index');
+
+save('tts_1-2.mat', 'err', 'g');

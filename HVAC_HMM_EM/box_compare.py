@@ -36,7 +36,7 @@ def build_data(file,err_compare_total,err_mean_total):
     err_compare_total.append(err_compare)
     
 if __name__ == '__main__':
-    files = ['tts_CRF.mat','tts_MM.mat','tts_1-1.mat','ttsEM_1-1.mat']
+    files = ['tts_CRF.mat','tts_MM.mat','tts_1-1.mat','ttsEM_1-1_new.mat']
     err_compare_total = []
     err_mean_total = []
     for i in range(len(files)):
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         for j in range(len(err_compare_total)):
             data.append(err_compare_total[j][k])
     fig, ax1 = plt.subplots(figsize=(25, 10))
-    fig.canvas.set_window_title('Comparision between CRF, DBN, ViterbiEM, EM for tts_1-1')
+    fig.canvas.set_window_title('Comparision between CRF, MM, ViterbiEM, EM for tts_1-1')
     # fig.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
     fig.subplots_adjust(left=0.065, right=0.95, top=0.9, bottom=0.20)
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     # Hide these grid behind plot objects
     ax1.set_axisbelow(True)
-    ax1.set_title('Comparison of Number of Errors per Day between CRF, DBN, ViterbiEM, EM for tts_1-1')
+    ax1.set_title('Comparison of Number of Errors per Day between CRF, MM, ViterbiEM, EM for tts_1-1')
     ax1.set_xlabel('Thermostat')
     ax1.set_ylabel('Number of Errors per Day')
 
@@ -116,13 +116,13 @@ if __name__ == '__main__':
     fig.text(0.7, 0.161, 'CRF, mean: '+str(err_mean_total[0]),
              backgroundcolor=boxColors[0], color='black', weight='roman',
              size='small',bbox={'facecolor':boxColors[0],'pad':3})
-    fig.text(0.76, 0.161, 'DBN, mean: '+str(err_mean_total[1]),
+    fig.text(0.76, 0.161, 'MM, mean: '+str(err_mean_total[1]),
              backgroundcolor=boxColors[1], color='black', weight='roman', 
              size='small',bbox={'facecolor':boxColors[1],'pad':3})
-    fig.text(0.82, 0.161, 'ViterbiEM, mean: '+str(err_mean_total[2]),
+    fig.text(0.818, 0.161, 'ViterbiEM, mean: '+str(err_mean_total[2]),
              backgroundcolor=boxColors[2], color='black', weight='roman',
              size='small',bbox={'facecolor':boxColors[2],'pad':3})
-    fig.text(0.90, 0.161, 'EM, mean: '+str(err_mean_total[3]),
+    fig.text(0.899, 0.161, 'EM, mean: '+str(err_mean_total[3]),
              backgroundcolor=boxColors[3], color='black', weight='roman', 
              size='small',bbox={'facecolor':boxColors[3],'pad':3})
     plt.show()

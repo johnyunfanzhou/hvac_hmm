@@ -61,10 +61,8 @@ for file_index = 1:num_files
     %% Initialization
 %     clear;
 %     clc;
-
-%     file_index = num_file;
     train_data_raw = importdata('sample_train1_data.mat');
-    train_data = train_data_raw{file_index};% data from the first/ 25th csv file
+    train_data = train_data_raw{file_index};
     test_data_raw = importdata('sample_test1_data.mat');
     test_data = test_data_raw{file_index};
     days_data_raw = importdata('sample_days1_data.mat');
@@ -105,20 +103,22 @@ for file_index = 1:num_files
         obs = train_data;
         obslik = multinomial_prob(obs, obsmat2);
         % plot(norm_seq(obslik))
-        [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
-        % result_seq = alpha
-        result_seq = zeros(1,size(alpha,2));
-        for i = 1:size(result_seq,2)
-            if alpha(1,i) >= alpha(2,i)
-                result_seq(i) = 1;
-            else
-                result_seq(i) = 2;
-            end
-        end
-    %     figure(1);
-        norm_result_seq = norm_seq(result_seq);
-        % subplot(3,1,1)
-    %     plot(norm_result_seq)
+%         [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
+%         % result_seq = alpha
+%         result_seq = zeros(1,size(alpha,2));
+%         for i = 1:size(result_seq,2)
+%             if alpha(1,i) >= alpha(2,i)
+%                 result_seq(i) = 1;
+%             else
+%                 result_seq(i) = 2;
+%             end
+%         end
+%     %     figure(1);
+%         norm_result_seq = norm_seq(result_seq);
+%         % subplot(3,1,1)
+%     %     plot(norm_result_seq)
+%     % try viterbi
+        result_seq = viterbi_path(prior2, transmat2, obslik);
 
         %% Infer the Most Likely Hidden States in Test Data
         test_obslik = multinomial_prob(test_data, obsmat2);
@@ -127,17 +127,18 @@ for file_index = 1:num_files
                 test_obslik(1,i) = 1e-23;
             end
         end
-        [alpha_2, beta_2, gamma_2, loglik_2, xi_2, gamma2_2] = fwdback(prior2, transmat2, test_obslik, 'fwd_only', 1);
-        state_seq = zeros(1,size(alpha_2,2));
-        for i = 1:size(state_seq,2)
-            if alpha_2(1,i) >= alpha_2(2,i)
-                state_seq(i) = 0;
-            else
-                state_seq(i) = 1;
-            end
-        end
-        % figure(2);
-        % plot(state_seq)
+%         [alpha_2, beta_2, gamma_2, loglik_2, xi_2, gamma2_2] = fwdback(prior2, transmat2, test_obslik, 'fwd_only', 1);
+%         state_seq = zeros(1,size(alpha_2,2));
+%         for i = 1:size(state_seq,2)
+%             if alpha_2(1,i) >= alpha_2(2,i)
+%                 state_seq(i) = 0;
+%             else
+%                 state_seq(i) = 1;
+%             end
+%         end
+%         % figure(2);
+%         % plot(state_seq)
+        state_seq = viterbi_path(prior2, transmat2, test_obslik)-1;
 
         %% Infer the Most Likely Observations
         obs_seq = zeros(1,size(state_seq,2));

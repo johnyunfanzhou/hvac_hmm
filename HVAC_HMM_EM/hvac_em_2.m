@@ -61,13 +61,11 @@ for file_index = 1:num_files
     %% Initialization
 %     clear;
 %     clc;
-
-%     file_index = num_file;
-    train_data_raw = importdata('sample_train2_data.mat');
-    train_data = train_data_raw{file_index};% data from the first/ 25th csv file
-    test_data_raw = importdata('sample_test2_data.mat');
+    train_data_raw = importdata('sample_train1_data.mat');
+    train_data = train_data_raw{file_index};
+    test_data_raw = importdata('sample_test1_data.mat');
     test_data = test_data_raw{file_index};
-    days_data_raw = importdata('sample_days2_data.mat');
+    days_data_raw = importdata('sample_days1_data.mat');
     days_data = days_data_raw{file_index};
     
     [M,S,H,W] = deal(zeros(1,size(test_data,2)));
@@ -105,20 +103,22 @@ for file_index = 1:num_files
         obs = train_data;
         obslik = multinomial_prob(obs, obsmat2);
         % plot(norm_seq(obslik))
-        [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
-        % result_seq = alpha
-        result_seq = zeros(1,size(alpha,2));
-        for i = 1:size(result_seq,2)
-            if alpha(1,i) >= alpha(2,i)
-                result_seq(i) = 1;
-            else
-                result_seq(i) = 2;
-            end
-        end
-    %     figure(1);
-        norm_result_seq = norm_seq(result_seq);
-        % subplot(3,1,1)
-    %     plot(norm_result_seq)
+%         [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
+%         % result_seq = alpha
+%         result_seq = zeros(1,size(alpha,2));
+%         for i = 1:size(result_seq,2)
+%             if alpha(1,i) >= alpha(2,i)
+%                 result_seq(i) = 1;
+%             else
+%                 result_seq(i) = 2;
+%             end
+%         end
+%     %     figure(1);
+%         norm_result_seq = norm_seq(result_seq);
+%         % subplot(3,1,1)
+%     %     plot(norm_result_seq)
+%     % try viterbi
+        result_seq = viterbi_path(prior2, transmat2, obslik);
 
         %% Infer the Most Likely Hidden States in Test Data
         test_obslik = multinomial_prob(test_data, obsmat2);
@@ -127,17 +127,18 @@ for file_index = 1:num_files
                 test_obslik(1,i) = 1e-23;
             end
         end
-        [alpha_2, beta_2, gamma_2, loglik_2, xi_2, gamma2_2] = fwdback(prior2, transmat2, test_obslik, 'fwd_only', 1);
-        state_seq = zeros(1,size(alpha_2,2));
-        for i = 1:size(state_seq,2)
-            if alpha_2(1,i) >= alpha_2(2,i)
-                state_seq(i) = 0;
-            else
-                state_seq(i) = 1;
-            end
-        end
-        % figure(2);
-        % plot(state_seq)
+%         [alpha_2, beta_2, gamma_2, loglik_2, xi_2, gamma2_2] = fwdback(prior2, transmat2, test_obslik, 'fwd_only', 1);
+%         state_seq = zeros(1,size(alpha_2,2));
+%         for i = 1:size(state_seq,2)
+%             if alpha_2(1,i) >= alpha_2(2,i)
+%                 state_seq(i) = 0;
+%             else
+%                 state_seq(i) = 1;
+%             end
+%         end
+%         % figure(2);
+%         % plot(state_seq)
+        state_seq = viterbi_path(prior2, transmat2, test_obslik)-1;
 
         %% Infer the Most Likely Observations
         obs_seq = zeros(1,size(state_seq,2));
@@ -162,6 +163,7 @@ for file_index = 1:num_files
             best_prior2 = prior2; 
             best_transmat2 = transmat2;
             best_obsmat2 = obsmat2;
+            best_error = error;
         end
     end
     
@@ -182,12 +184,16 @@ for file_index = 1:num_files
     %% Error Analysis
     err_per_day = zeros(1,size(days_data,2));
     j = 1;
-    while j <= size(error,2)
-        for i = 1:size(days_data,2)
-            err_per_day(i) = sum(error(j:(j+days_data(i)-1)));
+    
+    for i = 1:size(days_data,2)
+        if (j+days_data(i)-1) <= size(best_error,2)
+            err_per_day(i) = sum(best_error(j:(j+days_data(i)-1)));
             j = j + days_data(i);
+        else
+            break
         end
     end
+    
 %     if size(err_per_day,2) == 20
 %         err_per_day_total(:,file_index) = err_per_day';
 %     end
@@ -199,6 +205,8 @@ figure(2);
 boxplot(err_per_day_total,g);
 xlabel('Test Files');
 ylabel('Errors per Day');
+save('err_per_day_total.mat','err_per_day_total');
+save('g.mat','g');
 %% Bar Graph for Accuracy
 figure(3);
 bar(accuracy_total,0.6);
@@ -206,6 +214,7 @@ xlabel('Test Files');
 ylabel('Accuracy');
 title(sprintf('Accuracy, mean:%f%%',mean(accuracy_total)*100));
 set(gca,'XTick',1:1:25);
+save('accuracy_total.mat','accuracy_total');
 %%
 % figure(4);
 % subplot(3,1,1);

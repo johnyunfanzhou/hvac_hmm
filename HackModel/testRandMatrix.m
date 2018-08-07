@@ -1,3 +1,4 @@
+% INITIAL TESTING CODE, NOT USED ANY MORE
 % testing program
 % create random transition and emission matrices and generate data, which
 % will be used for training and hopefully recover the random matrices.

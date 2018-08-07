@@ -1,4 +1,6 @@
-% HVAC_HMM "Hack" model using time-shifting
+% HVAC_HMM "Hack" model
+% Test with clustered or random test data samples.
+% For the 20-days testing, please see HVAC_HMM_DaysTesting.
 % Please set the Current Folder to hvac_hmm
 % Please locate formed_data in the parent directory of hvac_hmm
 

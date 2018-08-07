@@ -2,6 +2,12 @@ function [currentState, logP] = hvacviterbi(data, tr, e, Sn, Hn, Wn)
 %% Modified hmmviterbi for the HVAC model.
 %   Transition matrix has size (Sn * Hn * Wn * 2, 2).
 %   Emission matrix has size (Sn * Hn * Wn * 2, Mn).
+% Inputs:
+%   Sn: # of possible values for season (3)
+%   Hn: # of possible values for hour (48)
+%   Wn: # of possible values for week (2)
+%   ('SYMBOLS',SYMBOLS) and ('STATENAMES',STATENAMES) are not allowed.
+% Outputs are the same as hmmviterbi.
 %% HMMVITERBI calculates the most probable state path for a data(:, 1)uence.
 %   STATES = HMMVITERBI(data(:, 1),TRANSITIONS,EMISSIONS) given a data(:, 1)uence, data(:, 1),
 %   calculates the most likely path through the Hidden Markov Model

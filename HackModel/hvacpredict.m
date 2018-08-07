@@ -11,9 +11,9 @@ function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, 
 %           and prediction will be performed on these data.
 %   supressOutput: default to false
 %   forward_prob: probability matrix of size (# sample)x2. Entry at (k, 0)
-%                 represents the probability that M at that k's data is 0, 
-%                 and entry at (k, 1) represents the probability that M at 
-%                 that k's data is 1.
+%                 represents the probability that M at kth data is 0, and 
+%                 entry at (k, 1) represents the probability that M at the 
+%                 kth data is 1 (i.e., kth row is [P(O_k=0), P(O_k=1)]).
 %                 If the k's data is observed (in the training set), row k
 %                 of this matrix should be set as [0.0, 1.0] or [1.0, 0.0].
 %                 Default fills all training data rows as [0.0, 1.0] or 
@@ -21,6 +21,13 @@ function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, 
 %                 rows as [0.0, 0.0] to be updated later during prediction.
 %   abortCheck: boolean if all input should be checked for correctness.
 %               Default at false;
+% Outputs:
+%   new_data: entire data matrix; train data entries are read from CSV,
+%             test data S, H, W entries are read from CSV, test data M
+%             entries are predicted.
+%   forward_prob: probability matrix of size (# sample)x2 taken from input,
+%                 with all testing data rows filled according to the 
+%                 observation probability.
 
     datasize = size(data, 1);
     nsize = size(narray, 2);

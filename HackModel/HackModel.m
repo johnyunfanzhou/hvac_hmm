@@ -1,6 +1,18 @@
 function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput)
-    
-    % supress output
+% Inputs:
+%   data: entire data read from CSV, matrix of size (# sample)x4, each row
+%         is (M, S, H, W).
+%   Sn: # of possible values for season (3)
+%   Hn: # of possible values for hour (48)
+%   Wn: # of possible values for week (2)
+%   maxIteration: maximum number of iterations viterbi EM can perform.
+%                 Default to 10.
+%   supressOutput: default to false
+% Outputs:
+%   A: trained transition matrix
+%   B: trained emission matrix
+%   state: trained sequence of hidden states
+%   itr: number of iterations to reach absolute convergence
 
     if nargin < 6
         supressOutput = false;

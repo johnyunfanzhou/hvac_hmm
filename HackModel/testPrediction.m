@@ -1,11 +1,26 @@
 function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, testPercentage, maxIteration, supressOutput)
+% randomly choose some entries in the entire data as test data, and predict
+% the observations of these data. This random process is performed for 30
+% trials. Mean accuracy of the 30 trials are calculated. A 
 % Inputs:
 %   data: entire data read from CSV, matrix of size (# sample)x4, each row
 %         is (M, S, H, W).
 %   Sn: # of possible values for season (3)
 %   Hn: # of possible values for hour (48)
 %   Wn: # of possible values for week (2)
-
+%   testPercentage: percentage of data to be used as test data. Default to
+%                   0.25.
+%   maxIteration: maximum number of iterations viterbi EM can perform.
+%                 Default to 10.
+%   supressOuput: default to false
+% Outputs:
+%   accuracy: percentage of data predicted correctly, between 0.0 and 1.0.
+%   predictions: average prediction of every entry in the data
+%   fPred: figure of prediction results
+%   fProb: figure of observation prediction probabilities
+%   A: trained transition matrix
+%   B: trained emission matrix
+%   state: trained sequence of hidden states
 
     if nargin < 7
         supressOutput = true;

@@ -1,4 +1,6 @@
-% HVAC_HMM "Hack" model using time-shifting
+% HVAC_HMM "Hack" model
+% Test with clustered or random test data samples.
+% For the 20-days testing, please see HVAC_HMM_DaysTesting.
 % Please set the Current Folder to hvac_hmm
 % Please locate formed_data in the parent directory of hvac_hmm
 
@@ -97,10 +99,7 @@ fObs = figure('Name','Motion Sensor Observations','NumberTitle','off');
 
 %% prediction result
 
-mode = 'rand'; % 'rand': randomly select test data
-               % 'clus': select the last cluster of data as test data
-
-[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn, mode);
+[accuracy, predictions, fPred, fProb] = testPrediction(data, Sn, Hn, Wn);
 fprintf('Predict accuracy is %f\n', accuracy);
 
 %% save figures (comment if already saved)

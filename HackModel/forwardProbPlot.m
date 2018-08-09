@@ -80,7 +80,7 @@ function [smrPlot, falPlot, wtrPlot] = forwardProbPlot(data, forward_prob, Sn, H
 
     subplot(3, 1, 3);
     wtrPlot = plot(0:Hn-1, wtrWday, 'r', 0:Hn-1, wtrWend, 'b');
-    axis([0, 48, 0, 1]);
+    axis([0, 48, 0, 2]);
     title('Probability of occupancy in Winter');
     legend('Weekdays', 'Weekends', 'Location', 'northeast');
 end

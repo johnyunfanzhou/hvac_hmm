@@ -53,7 +53,7 @@ function [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, narray, 
         if ~isequal(size(forward_prob), [datasize, 2])
             error('Invalid probability vector size. Previous forward probabily has to be size datasizex2.');
         end
-        hvaccheckmatrix(A, B, Sn, Hn, Wn);
+        hvaccheckmatrix(A, B, Sn, Hn, Wn, On);
         hvaccheckdata(data, Sn, Hn, Wn);
         if ~supressOutput
             disp('Autogenerating existing forward probabilities.');

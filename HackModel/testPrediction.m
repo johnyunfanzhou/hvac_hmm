@@ -1,4 +1,4 @@
-function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, testPercentage, maxIteration, supressOutput)
+function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(data, Sn, Hn, Wn, On, testPercentage, maxIteration, supressOutput)
 % randomly choose some entries in the entire data as test data, and predict
 % the observations of these data. This random process is performed for 30
 % trials. Mean accuracy of the 30 trials are calculated. A 
@@ -22,11 +22,11 @@ function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(dat
 %   B: trained emission matrix
 %   state: trained sequence of hidden states
 
-    if nargin < 7
+    if nargin < 8
         supressOutput = true;
-        if nargin < 6
+        if nargin < 7
             maxIteration = 10;
-            if nargin < 5
+            if nargin < 6
                 testPercentage = 0.25;
             end
         end
@@ -46,8 +46,8 @@ function [accuracy, predictions, fPred, fProb, A, B, state] = testPrediction(dat
     for trial = 1 : 30
         testdata = sort(randperm(datasize - 1, testsize) + 1);
         traindata = alldata(~ismember(alldata, testdata));
-        [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, maxIteration, true);
-        [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, testdata, supressOutput);
+        [A, B, state] = HackModel(data(traindata, :), Sn, Hn, Wn, On, maxIteration, true);
+        [new_data, forward_prob] = hvacpredict(A, B, data, Sn, Hn, Wn, On, testdata, supressOutput);
         predictions = new_data(:, 1);
         allaccuracy(trial) = 1 - sum(abs(predictions(testdata) - data(testdata, 1)))/testsize;
         avgpredictions(testdata) = avgpredictions(testdata) + predictions(testdata);

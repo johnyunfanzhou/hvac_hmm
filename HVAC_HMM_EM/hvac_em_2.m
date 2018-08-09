@@ -1,6 +1,4 @@
-O = 3*48*2*2;
-Q = 2;
-
+%% Specify Test Files
 % test_files = ["test_1cca90adb7de8aabbb74be37171e805ba6dd74e8.csv"
 %                 ,"test_2cceb7f426f847d09f9c4d15808e24884bb3dbf8.csv"
 %                 ,"test_02d4dbbdec6d776bf72ef3ee530ef2de918ce363.csv"
@@ -52,40 +50,60 @@ test_files = ["test_1d0733906f57440ecade6f8d3f091630de8c24ec.csv"
 			,"test_e79039a7615153cfebfda4669160c06ad3a5658d.csv"
 			,"test_f17826dce7c323c15e8f1e91cb7543f10b09520d.csv"
 			,"test_fb4d3fa98447464e0d38ba15b6928ed5ca072eef.csv"];
+        
+%% Initialization
 num_files = size(test_files,1);
+% Initialize total accuracy and error and g that stores value for each file
+% g is used in box plotting that 
 accuracy_total = zeros(1,num_files);
 err_per_day_total = [];
 g = [];
+% Mn: # of M values, boolean, {0,1}, Mn = 2
+% Sn: # of S values, {0,1,2}, 3 seasons, Sn = 3
+% Hn: # of timesteps in a day, 30-min increment, {0,1,...,47},Hn = 48
+% Wn: # of W values, boolean, {0,1}, Wn = 2
+% O: size of observation set = # (M,S,H,W) combinations; as per toolbox
+% Q: size of state set; as per toolbox
+Mn = 2;
+Sn = 3;
+Hn = 48;
+Wn = 2;
+O = Mn * Sn * Hn * Wn;
+Q = 2;
 
+%%
 for file_index = 1:num_files
-    %% Initialization
-%     clear;
-%     clc;
+    %% Import Data
+    % parser_train.py outputs a .mat file 'sample_train1_data.mat' that
+    % contains all observation sequences w/ incomplete days of data deleted
     train_data_raw = importdata('sample_train1_data.mat');
+    % file_index according to the outer for loop, each loop for one file
     train_data = train_data_raw{file_index};
+    % parser_test.py outputs a .mat file 'sample_test1_data.mat' that
+    % contains all testing observation sequences (no deletion)
     test_data_raw = importdata('sample_test1_data.mat');
     test_data = test_data_raw{file_index};
+    % parser_test.py also outputs the number of test days involved for each
+    % thermostat file
     days_data_raw = importdata('sample_days1_data.mat');
     days_data = days_data_raw{file_index};
     
+    % Extract M readings for each file
+    % This can be later changed to directly read from the .csv file
     [M,S,H,W] = deal(zeros(1,size(test_data,2)));
     for i = 1:size(test_data,2)
         [M(i),S(i),H(i),W(i)] = extrac_num(test_data(i));
     end
 
-    % %% initial guess of parameters
-    % prior1 = normalise(rand(Q,1));
-    % transmat1 = mk_stochastic(rand(Q,Q));
-    % obsmat1 = mk_stochastic(rand(Q,O));
-
-    %%
+    %% Initialize variables to record the trial with highest accuracy
     best_accuracy = 0;
     best_state_seq = zeros(1,size(test_data,2));
     best_obs_seq = zeros(1,size(test_data,2));
-    best_prior2 = zeros(2,1);
-    best_transmat2 = zeros(2,2);
-    best_obsmat2 = zeros(2,O);
+    best_prior2 = zeros(Q,1);
+    best_transmat2 = zeros(Q,Q);
+    best_obsmat2 = zeros(Q,O);
 
+    %% Iterate through 30 trails and obtain the highest accuracy
     for trial = 1:30
         %% initial guess of parameters
         prior1 = normalise(rand(Q,1));
@@ -94,57 +112,49 @@ for file_index = 1:num_files
 
         %% improve guess of parameters using EM
         [LL, prior2, transmat2, obsmat2] = dhmm_em(train_data, prior1, transmat1, obsmat1, 'max_iter', 100);
-        % use model to compute log likelihood
+        % use model to compute log likelihood; as per toolbox
         loglik = dhmm_logprob(train_data, prior2, transmat2, obsmat2);
         % log lik is slightly different than LL(end), since it is computed after the final M step
-        %% Forward Algorithm
-        % data = num2cell(data, 2);
-    %     index = 7;
+        %% Viterbi Algorithm applied on Training Data
         obs = train_data;
         obslik = multinomial_prob(obs, obsmat2);
-        % plot(norm_seq(obslik))
-%         [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
-%         % result_seq = alpha
-%         result_seq = zeros(1,size(alpha,2));
-%         for i = 1:size(result_seq,2)
-%             if alpha(1,i) >= alpha(2,i)
-%                 result_seq(i) = 1;
-%             else
-%                 result_seq(i) = 2;
-%             end
-%         end
-%     %     figure(1);
-%         norm_result_seq = norm_seq(result_seq);
-%         % subplot(3,1,1)
-%     %     plot(norm_result_seq)
-%     % try viterbi
         result_seq = viterbi_path(prior2, transmat2, obslik);
-
+%       if use Forward Algorithm
+%       [alpha, beta, gamma, loglik, xi, gamma2] = fwdback(prior2, transmat2, obslik, 'fwd_only', 1);
+%        result_seq = zeros(1,size(alpha,2));
+%        for i = 1:size(result_seq,2)
+%            if alpha(1,i) >= alpha(2,i)
+%                result_seq(i) = 1;
+%            else
+%                result_seq(i) = 2;
+%            end
+%        end
+%        figure(1);
+%        norm_result_seq = norm_seq(result_seq);
+%        subplot(3,1,1)
+%        plot(norm_result_seq)
+         
         %% Infer the Most Likely Hidden States in Test Data
         test_obslik = multinomial_prob(test_data, obsmat2);
+        % avoid all zero entries, due to rounding
         for i = 1:size(test_obslik,2)
             if test_obslik(1,i) == 0
-                test_obslik(1,i) = 1e-23;
+                test_obslik(1,i) = 1e-23;% add a very small number
             end
         end
-%         [alpha_2, beta_2, gamma_2, loglik_2, xi_2, gamma2_2] = fwdback(prior2, transmat2, test_obslik, 'fwd_only', 1);
-%         state_seq = zeros(1,size(alpha_2,2));
-%         for i = 1:size(state_seq,2)
-%             if alpha_2(1,i) >= alpha_2(2,i)
-%                 state_seq(i) = 0;
-%             else
-%                 state_seq(i) = 1;
-%             end
-%         end
-%         % figure(2);
-%         % plot(state_seq)
+        % using Viterbi Algorithm  
         state_seq = viterbi_path(prior2, transmat2, test_obslik)-1;
 
         %% Infer the Most Likely Observations
+        % obs_seq is the most likely M readings in the observations
         obs_seq = zeros(1,size(state_seq,2));
         for i = 1:size(state_seq,2)
-            index1 = W(i) + 2*H(i) + 2*48*S(i) + 2*48*3*0 + 1;
-            index2 = W(i) + 2*H(i) + 2*48*S(i) + 2*48*3*1 + 1;
+            % Since (S,H,W) in (M,S,H,W) are actually known in sequence, we
+            % can compare the probability of (0,S,H,W) with (1,S,H,W) in
+            % the Emission Probability Matrix obsmat2; the one with higher 
+            % probability tells us if M = 0 or 1
+            index1 = W(i) + Wn*H(i) + Wn*Hn*S(i) + Wn*Hn*Sn*0 + 1;
+            index2 = W(i) + Wn*H(i) + Wn*Hn*S(i) + Wn*Hn*Sn*1 + 1;
             if obsmat2(state_seq(i)+1,index1) > obsmat2(state_seq(i)+1, index2)
                 obs_seq(i) = 0;
             else
@@ -152,10 +162,16 @@ for file_index = 1:num_files
             end
         end
         %% Accuracy
+        % obs_seq is the returned M readings from Viterbi
+        % error is where obs_seq and actual M readings do not match
         error = abs(obs_seq - M);
         accuracy = 0;
+        % print the current accuracy in this trial
         accuracy = 1 - (sum(error)/size(obs_seq,2))
+        % print the current best_accuracy
         best_accuracy
+        % if the accuracy for the current trial is better than the previous 
+        % best_accuracy, the best_xx variables will be replaced
         if accuracy > best_accuracy
             best_accuracy = accuracy;
             best_state_seq = state_seq;
@@ -166,8 +182,10 @@ for file_index = 1:num_files
             best_error = error;
         end
     end
-    
+    % At the end of this 30 trials
+    % store best_accuracy of each thermostat file into accuracy_total
     accuracy_total(file_index) = best_accuracy;
+    %% Plot 
     figure(1);
     subplot(3,1,1);
     plot(best_state_seq)
@@ -179,12 +197,14 @@ for file_index = 1:num_files
     subplot(3,1,3);
     plot(M)
     title('True Observation Sequence (M)');
+    % save this plot, figure name is the same as each filename
     saveas(gcf, strcat(test_files(file_index),'.jpg'));
     
     %% Error Analysis
+    % From best_error, split it according to days_data, to get errors made 
+    % per day
     err_per_day = zeros(1,size(days_data,2));
     j = 1;
-    
     for i = 1:size(days_data,2)
         if (j+days_data(i)-1) <= size(best_error,2)
             err_per_day(i) = sum(best_error(j:(j+days_data(i)-1)));
@@ -193,11 +213,9 @@ for file_index = 1:num_files
             break
         end
     end
-    
-%     if size(err_per_day,2) == 20
-%         err_per_day_total(:,file_index) = err_per_day';
-%     end
+    % Store err_per_day of each file into the entire err_per_day_total
     err_per_day_total = [err_per_day_total, err_per_day];
+    % g records number of days for each file and will be used in box plot
     g = [g, file_index * ones(1,size(days_data,2))];
 end
 %% Box Plot for Error
@@ -205,6 +223,8 @@ figure(2);
 boxplot(err_per_day_total,g);
 xlabel('Test Files');
 ylabel('Errors per Day');
+% save err_per_day_total and g as .mat file, which will be used later in
+% box plot comparison with other models
 save('err_per_day_total.mat','err_per_day_total');
 save('g.mat','g');
 %% Bar Graph for Accuracy
@@ -214,16 +234,5 @@ xlabel('Test Files');
 ylabel('Accuracy');
 title(sprintf('Accuracy, mean:%f%%',mean(accuracy_total)*100));
 set(gca,'XTick',1:1:25);
+% save accuracy_total, which may be used later
 save('accuracy_total.mat','accuracy_total');
-%%
-% figure(4);
-% subplot(3,1,1);
-% plot(best_state_seq(432:480));
-% title({test_files(25);'Most Likely State Sequence'},'Interpreter','none');
-% subplot(3,1,2);
-% plot(best_obs_seq(432:480));
-% title_str = 'Most Likely Observation Sequence, Accuracy: %f%%';
-% title(sprintf(title_str,best_accuracy*100));
-% subplot(3,1,3);
-% plot(M(432:480));
-% title('True Observation Sequence (M)');

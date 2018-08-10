@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split;
 from sklearn.ensemble import RandomForestClassifier;
 import scipy.io;
 
-k = 0;
+k = 2;
 print('Random Forest Linear Model of Order %d:' % k);
 
 err = [];

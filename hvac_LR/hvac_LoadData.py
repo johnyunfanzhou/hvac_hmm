@@ -57,50 +57,7 @@ def load_data(FileIndex):
     os.chdir(os.path.dirname(__file__))
     return result;
     
-# def generate_features(data, k, HISTORY = None, FILL = False):
-#     '''
-#     Given training data (data) and training degree (k),
-#     output the feature matrix
-#     If discontinuous data is detected, use history average (HISTORY) to guess 
-#     the missing data.
-#     If there is no history average (HISTORY == None), delete the sample.
-#     If FILL == True, discontinuous entries are filled with zeros.
-#     '''
-#     datasize = len(data);
-#     X = [];
-#     for i in range (datasize):
-#         x = [];
-#         x.append(data[i][2]);
-#         x.append(data[i][3]);
-#         x.append(data[i][4]);
-#         n = i;
-#         datacontinuous = True;
-#         for j in range (k):
-#             if datacontinuous:
-#                 if (n == 1):
-#                     datacontinuous = False;
-#                 elif ((data[n][3] - data[n - 1][3]) % 48 != 1):
-#                     datacontinuous = False;
-#                 elif (data[n][3] != 0):
-#                     if ((data[n][2] != data[n - 1][2]) or (data[n][4] != data[n - 1][4])):
-#                         datacontinuous = False;
-#             if datacontinuous:
-#                 x.append(data[n - 1][1]);
-#                 n -= 1;
-#             else:
-#                 if HISTORY == None:
-#                     if FILL:
-#                         x.append(0);
-#                     else:
-#                         break;
-#                 else:
-#                     x.append(HISTORY[(data[n][2], (data[n][3] - 1) % 48, data[n][4])]);
-#                 n -= 1;
-#         if (len(x) == 3 + k):
-#             X.append(x);
-#     return X;
-    
-def generate_features(data, k, HISTORY = None, FILL = False):
+def generate_features(data, k, HISTORY = None, FILL = False, IncDATE = True):
     '''
     Given training data (data) and training order (k),
     output the feature matrix
@@ -109,9 +66,13 @@ def generate_features(data, k, HISTORY = None, FILL = False):
     If there is no history average (HISTORY == None) but FILL == True, 
     discontinuous entries are filled with zeros; otherwise the sample is 
     deleted.
+    If IncDATE = True, the function will reture X, date, where date is a list of 
+    strings in the format 'YYYY-MM-DD', telling the corresponding date of each 
+    sample entry in X.
     '''
     datasize = len(data);
     X = [];
+    date = [];
     for i in range (datasize):
         x = [];
         x.append(data[i][2]);
@@ -151,12 +112,18 @@ def generate_features(data, k, HISTORY = None, FILL = False):
                     if FILL:
                         x.append(0);
                     else:
-                        break;
+                        break; # this case, the feature vectore will not have 
+                               # suffient number of elements, and will not be 
+                               # appended to the matrix.
                 else:
                     x.append(HISTORY[(s, h, w)]);
+        # append the feature vector (x) to the list if it is complete
+        # if and only if HISTORY = None and FILL = False, x is not complete and 
+        # will not be appended (will be discarded)
         if (len(x) == 3 + k):
             X.append(x);
-    return X;
+            date.append(data[i][0][:10]);
+    return X, date;
 
 def generate_labels(data, k, HISTORY = None, FILL = False):
     '''
@@ -188,7 +155,7 @@ def generate_labels(data, k, HISTORY = None, FILL = False):
             else:
                 y.append(data[i][1]);
     return y;
-    
+
 def load_tts(FileIndex, k, HISTORY = None, FILL = False):
     '''
     Read CSV file and return X_train, X_test, y_train, y_test
@@ -198,15 +165,22 @@ def load_tts(FileIndex, k, HISTORY = None, FILL = False):
     If there is no history average (HISTORY == None) but FILL == True, 
     discontinuous entries are filled with zeros; otherwise the sample is 
     deleted.
+    
+    ****** BUG ******
+    If len(X) != len(data), i.e.discontinuous data were deleted, then data[i] 
+    and X[i] do not match each other. Testing dates were detected using data, 
+    but entries in X were appended to the testing set; they may not necessarily 
+    match in this case.
+    
     '''
     data = load_data(FileIndex);
-    X = generate_features(data, k, HISTORY, FILL);
+    X, date = generate_features(data, k, HISTORY, FILL, IncDATE = True);
     y = generate_labels(data, k, HISTORY, FILL);
     datasize = len(X);
 
     test_entries = [];
     
-    os.chdir('../formed_data/tts_1/test_1/');
+    os.chdir('../../formed_data/tts_1/test_1/');
     
     with open('test_' + filename[FileIndex], 'r', newline = '') as csvfile:
         reader = csv.reader(csvfile, delimiter = ',');
@@ -226,13 +200,12 @@ def load_tts(FileIndex, k, HISTORY = None, FILL = False):
     y_test = {};
     
     for i in range (datasize):
-        date = data[i][0][:10];
-        if date in test_entries:
-            if date not in X_test.keys():
-                X_test[date] = [];
-                y_test[date] = [];
-            X_test[date].append(X[i]);
-            y_test[date].append(y[i]);
+        if date[i] in test_entries:
+            if date[i] not in X_test.keys():
+                X_test[date[i]] = [];
+                y_test[date[i]] = [];
+            X_test[date[i]].append(X[i]);
+            y_test[date[i]].append(y[i]);
         else:
             X_train.append(X[i]);
             y_train.append(y[i]);

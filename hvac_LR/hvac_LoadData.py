@@ -156,7 +156,7 @@ def generate_labels(data, k, HISTORY = None, FILL = False):
                 y.append(data[i][1]);
     return y;
 
-def load_tts(FileIndex, k, HISTORY = None, FILL = False):
+def load_tts(FileIndex, k, test_number, HISTORY = None, FILL = False):
     '''
     Read CSV file and return X_train, X_test, y_train, y_test
     k is the order of the linear model
@@ -180,7 +180,7 @@ def load_tts(FileIndex, k, HISTORY = None, FILL = False):
 
     test_entries = [];
     
-    os.chdir('../../formed_data/tts_1/test_1/');
+    os.chdir('../../formed_data/tts_1/test_' + str(test_number) + '/');
     
     with open('test_' + filename[FileIndex], 'r', newline = '') as csvfile:
         reader = csv.reader(csvfile, delimiter = ',');
@@ -215,7 +215,7 @@ def load_tts(FileIndex, k, HISTORY = None, FILL = False):
     
 def HISTORY(X, y):
     '''
-    Giving a list of features and labels,
+    Given a list of features and labels,
     output the most likely observations for giving (s, h, w)
     return a dict: {(s, h, w): obs}
     '''
@@ -233,3 +233,18 @@ def HISTORY(X, y):
                 index = w + 2 * (h + 48 * s);
                 result[(s, h, w)] = count[index].index(max(count[index]));
     return result;
+    
+def CI95(list):
+    '''
+    Given a list of result from 5 trials ** has to be 5 **
+    return the 95% CI
+    '''
+    if (len(list) != 5):
+        raise ValueError('List length has to be 5.');
+    
+    mean = sum(list)/5;
+    t = 2.776;
+    s = (sum([(list[i] - mean) ** 2 for i in range (5)]) / 4) ** 0.5;
+    uncertainty = t * s / 2.23606797749979;
+    return (mean - uncertainty, mean + uncertainty);
+    

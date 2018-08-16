@@ -84,9 +84,8 @@ data = csvread(filename1(file_index, :), 1, 1);
 Sn = 3;
 Wn = 2;
 Hn = 48;
-On = 3;
 
-[A, B, state, itr] = HackModel(data, Sn, Hn, Wn, On);
+[A, B, state, itr] = HackModel(data, Sn, Hn, Wn);
 
 %% result summary
 

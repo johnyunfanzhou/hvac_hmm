@@ -1,4 +1,4 @@
-function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, On, maxIteration, supressOutput)
+function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, maxIteration, supressOutput)
 % Inputs:
 %   data: entire data read from CSV, matrix of size (# sample)x4, each row
 %         is (M, S, H, W).
@@ -14,25 +14,25 @@ function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, On, maxIteration, supr
 %   state: trained sequence of hidden states
 %   itr: number of iterations to reach absolute convergence
 
-    if nargin < 7
+    if nargin < 6
         supressOutput = false;
-        if nargin < 6
+        if nargin < 5
             maxIteration = 10;
         end
     end
     
     datasize = size(data, 1);
 
-    state = floor(rand(datasize, 1) * On);
+    state = floor(rand(datasize, 1) * 2);
     
     hvaccheckdata(data, Sn, Hn, Wn);
 
     % possible number of states (N) and observations (M)
-    N = Sn * Wn * Hn * On;
+    N = Sn * Wn * Hn * 2;
 
     % state transition matrix (A) and observation probability matrix (B)
     % use ones to achieve laplace smoothing
-    A = ones (N, On);
+    A = ones (N, 2);
     B = ones (N, 2);
     
     itr = maxIteration + 1;
@@ -60,7 +60,7 @@ function [A, B, state, itr] = HackModel(data, Sn, Hn, Wn, On, maxIteration, supr
 
         % viterbi to find new states
         oldstate = state;
-        state = hvacviterbi(data, A, B, Sn, Hn, Wn, On);
+        state = hvacviterbi(data, A, B, Sn, Hn, Wn);
         state_changed = sum(abs(state - oldstate));
         if ~supressOutput
             fprintf('Iteration %d: %d state(s) changed\n', iteration, state_changed);

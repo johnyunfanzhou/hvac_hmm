@@ -1,7 +1,7 @@
-function [currentState, logP] = hvacviterbi(data, tr, e, Sn, Hn, Wn, On)
+function [currentState, logP] = hvacviterbi(data, tr, e, Sn, Hn, Wn)
 %% Modified hmmviterbi for the HVAC model.
-%   Transition matrix has size (Sn * Hn * Wn * On, 2).
-%   Emission matrix has size (Sn * Hn * Wn * On, Mn).
+%   Transition matrix has size (Sn * Hn * Wn * 2, 2).
+%   Emission matrix has size (Sn * Hn * Wn * 2, Mn).
 % Inputs:
 %   Sn: # of possible values for season (3)
 %   Hn: # of possible values for hour (48)
@@ -58,11 +58,11 @@ function [currentState, logP] = hvacviterbi(data, tr, e, Sn, Hn, Wn, On)
 %% tr is Sn * Hn * Wn * 2 by 2
 
 numStates = size(tr,1);
-if numStates ~= Sn * Hn * Wn * On
+if numStates ~= Sn * Hn * Wn * 2
     error(message('stats:hvacviterbi:BadTransitions'));
 end
 checkTr = size(tr,2);
-if checkTr ~= On
+if checkTr ~= 2
     error(message('stats:hvacviterbi:BadTransitions'));
 end
 
@@ -89,9 +89,9 @@ logTR = log(tr);
 logE = log(e);
 
 %% allocate space
-pTR = zeros(On,L);
+pTR = zeros(2,L);
 % assumption is that model is in state 1 at step 0
-v = -Inf(On,1);
+v = -Inf(2,1);
 v(1,1) = 0;
 vOld = v;
 
@@ -101,13 +101,13 @@ for count = 1:L
     h = data(count, 3);
     w = data(count, 4);
 
-    for state = 1:On
+    for state = 1:2
         % for each state we calculate
         % v(state) = e(state,seq(count))* max_k(vOld(:)*tr(k,state));
         bestVal = -inf;
         bestPTR = 0;
         % use a loop to avoid lots of calls to max
-        for inner = 1:On
+        for inner = 1:2
             index = inner + 2 * (h + Hn * (w + Wn * s));
             val = vOld(inner) + logTR(index,state);
             if val > bestVal

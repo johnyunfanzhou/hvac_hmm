@@ -17,8 +17,8 @@ Change to the directory containing the `formed_data` folder and clone this repos
 
 `$ git clone https://github.com/z2862658714/hvac_hmm`
 
-## HVAC Linear Models with LR and RF
-The codes for this model is included in the `/HVAC_LR` subdirectory.
+## HVAC Linear Model with LR and RF
+The code for this model is included in the `/HVAC_LR` subdirectory.
 
 Change to the directory `/HVAC_LR` and execute
 
@@ -41,3 +41,5 @@ In hvac_LR.py or hvac_RF.py
 Uncomment one of the above four sections and comment the other three to adjust the behavior of the linear model.
 
 Uncomment line 48 to save the result as MAT files.
+
+** Please do not hesitate to reach us on keybase if anything needs to be clarified! **

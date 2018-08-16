@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression;
 import scipy.io;
 
 for k in [0, 1, 2, 3]:
-    print('Random Forest Linear Model of Order %d:' % k);
+    print('Logistic Regression Linear Model of Order %d:' % k);
     result_list = [];
     for test_number in [1, 2, 3, 4, 5]:
         print('Train test set %d:' % test_number);
@@ -26,7 +26,7 @@ for k in [0, 1, 2, 3]:
             # fill discontinuities with zero's
             # X_train, X_test, y_train, y_test = ld.load_tts(FileIndex, k, FILL = True);
             
-            # fill discontinuities with most likely observations from the traiming set
+            # fill discontinuities with most likely observations from the training set
             # X_train, X_test, y_train, y_test = ld.load_tts(FileIndex, k);
             # X_train, X_test, y_train, y_test = ld.load_tts(FileIndex, k, HISTORY = ld.HISTORY(X_train, y_train));
             

@@ -7,7 +7,7 @@
 | Logistic Regression | (12.521 , 13.091) | (8.763 , 9.023) | (8.697 , 9.037) | (8.778 , 9.050) |
 | Random Forest | (10.230 , 10.827) | (8.273 , 8.612) | (8.327 , 8.624) | (8.564 , 8.712) |
 
-## Logistic Regression
+## Logistic Regression Output
 
 ```
 Logistic Regression Linear Model of Order 0:
